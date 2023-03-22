@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "131828782150",
+    "project_id": "instgram-clone-fc718",
+    "storage_bucket": "instgram-clone-fc718.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:131828782150:android:712f93b78a572fe56da647",
+        "android_client_info": {
+          "package_name": "com.example.instgram"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "131828782150-5ai34l73cgs09885a6lnqgn490km6r5e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGWHVrD3mwnnv_RW1hdr6G6l14xiG2ce0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "131828782150-5ai34l73cgs09885a6lnqgn490km6r5e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
