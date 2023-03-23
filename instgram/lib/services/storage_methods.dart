@@ -12,6 +12,7 @@ class StorageMethods {
         _storage.ref().child(childName).child(_auth.currentUser!.uid);
     UploadTask uploadTask = ref.putData(file);
     TaskSnapshot snap = await uploadTask;
-    return await snap.ref.getDownloadURL();
+    String imageUrl = await snap.ref.getDownloadURL();
+    return imageUrl;
   }
 }

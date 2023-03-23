@@ -5,25 +5,30 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:instgram/services/assets_manger.dart';
 import 'package:instgram/services/image_picker.dart';
+import 'package:instgram/services/show_snack_bar.dart';
 import 'package:instgram/theme/colors.dart';
 import 'package:instgram/widgets/custom_button.dart';
 import 'package:instgram/widgets/custom_text_field.dart';
 
+import '../responsive/mobile_screen_layout.dart';
+import '../responsive/responsive_layout_screen.dart';
+import '../responsive/web_screen_layout.dart';
 import '../services/auth_methods.dart';
 
-class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
   Uint8List? _selectedImage;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -39,6 +44,43 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() {
       _selectedImage = image;
     });
+  }
+
+  void _signUpUser() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    String res = await AuthMethods().signUpUser(
+      email: _emailController.text,
+      password: _passwordController.text,
+      username: _userNameController.text,
+      bio: _bioController.text,
+      file: _selectedImage!,
+    );
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (res != "success") {
+      // ignore: use_build_context_synchronously
+      showSnackBar(res, context, true);
+    } else {
+      // ignore: use_build_context_synchronously
+      showSnackBar(
+          "Account created successfully, please login", context, false);
+      // ignore: use_build_context_synchronously
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const ResponsiveLayout(
+            webScreenLayout: WebScreenLayout(),
+            mobileScreenLayout: MobileScreenLayout(),
+          ),
+        ),
+      );
+    }
   }
 
   @override
@@ -110,18 +152,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 keyboardType: TextInputType.visiblePassword,
               ),
               const SizedBox(height: 24),
-              CustomButton(
-                  text: "Sign up",
-                  onTap: () async {
-                    String res = await AuthMethods().signUpUser(
-                      email: _emailController.text,
-                      password: _passwordController.text,
-                      username: _userNameController.text,
-                      bio: _bioController.text,
-                      file: _selectedImage!,
-                    );
-                    debugPrint(res);
-                  }),
+              _isLoading
+                  ? const CircularProgressIndicator()
+                  : CustomButton(
+                      text: "Sign up",
+                      onTap: () {
+                        if (_emailController.text.isNotEmpty ||
+                            _userNameController.text.isNotEmpty ||
+                            _passwordController.text.isNotEmpty ||
+                            _bioController.text.isNotEmpty) {
+                          _signUpUser();
+                        } else {
+                          showSnackBar(
+                            "All fields are required",
+                            context,
+                            true,
+                          );
+                        }
+                      },
+                    ),
               Flexible(flex: 3, child: Container()),
             ],
           ),
