@@ -8,7 +8,7 @@ class PostModel {
   final String datePublished;
   final String postUrl;
   final String profileImage;
-  final likes;
+  final List likes;
 
   PostModel({
     required this.description,
@@ -18,7 +18,7 @@ class PostModel {
     required this.postUrl,
     required this.profileImage,
     required this.postId,
-    this.likes,
+    required this.likes,
   });
 
   Map<String, dynamic> toJson() => {
@@ -28,6 +28,8 @@ class PostModel {
         "datePublished": datePublished,
         "postUrl": postUrl,
         "profileImage": profileImage,
+        "likes": likes,
+        "postId": postId,
       };
   static PostModel fromSnap(DocumentSnapshot snaps) {
     var snapshot = snaps.data() as Map<String, dynamic>;
@@ -39,6 +41,7 @@ class PostModel {
       datePublished: snapshot["datePublished"],
       postUrl: snapshot["postUrl"],
       profileImage: snapshot["profileImage"],
+      likes: snapshot["likes"],
     );
   }
 }

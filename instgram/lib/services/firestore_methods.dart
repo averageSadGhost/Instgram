@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:instgram/models/post_model.dart';
 import 'package:instgram/services/storage_methods.dart';
 import 'package:uuid/uuid.dart';
+import 'package:flutter/material.dart';
 
 class FirestoreMethods {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -36,5 +37,21 @@ class FirestoreMethods {
       res = error.toString();
     }
     return res;
+  }
+
+  Future<void> likePost(String posdId, String uId, List likes) async {
+    try {
+      if (likes.contains(uId)) {
+        await _firestore.collection("posts").doc(posdId).update({
+          "likes": FieldValue.arrayRemove([uId]),
+        });
+      } else {
+        await _firestore.collection("posts").doc(posdId).update({
+          "likes": FieldValue.arrayUnion([uId]),
+        });
+      }
+    } catch (error) {
+      debugPrint("error on likePost ${error.toString()}");
+    }
   }
 }

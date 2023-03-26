@@ -32,6 +32,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
       if (res == "success") {
         // ignore: use_build_context_synchronously
         showSnackBar("Posted successfully!", context, false);
+        _reset();
       } else {
         // ignore: use_build_context_synchronously
         showSnackBar(res, context, true);
@@ -94,6 +95,13 @@ class _AddPostScreenState extends State<AddPostScreen> {
     _descriptionController.dispose();
   }
 
+  _reset() {
+    setState(() {
+      _file = null;
+      _descriptionController.clear();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final UserModel user = Provider.of<UserProvider>(context).getUser;
@@ -113,6 +121,10 @@ class _AddPostScreenState extends State<AddPostScreen> {
         : Scaffold(
             appBar: AppBar(
               backgroundColor: mobileBackgroundColor,
+              leading: IconButton(
+                onPressed: _reset,
+                icon: const Icon(Icons.arrow_back),
+              ),
               title: const Text("Post to"),
               centerTitle: false,
               actions: [
@@ -137,53 +149,53 @@ class _AddPostScreenState extends State<AddPostScreen> {
                 ),
               ],
             ),
-            body: _isLoading
-                ? const Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          CircleAvatar(
-                            backgroundImage: NetworkImage(
-                              user.photoUrl,
+            body: Column(
+              children: [
+                _isLoading
+                    ? const LinearProgressIndicator()
+                    : const Padding(padding: EdgeInsets.only(top: 0)),
+                const Divider(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CircleAvatar(
+                      backgroundImage: NetworkImage(
+                        user.photoUrl,
+                      ),
+                    ),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.45,
+                      child: TextField(
+                        controller: _descriptionController,
+                        decoration: const InputDecoration(
+                          hintText: "Write a caption...",
+                          border: InputBorder.none,
+                        ),
+                        maxLines: 8,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 45,
+                      width: 45,
+                      child: AspectRatio(
+                        aspectRatio: 487 / 451,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              fit: BoxFit.fill,
+                              alignment: FractionalOffset.topCenter,
+                              image: MemoryImage(_file!),
                             ),
                           ),
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.45,
-                            child: TextField(
-                              controller: _descriptionController,
-                              decoration: const InputDecoration(
-                                hintText: "Write a caption...",
-                                border: InputBorder.none,
-                              ),
-                              maxLines: 8,
-                            ),
-                          ),
-                          SizedBox(
-                            height: 45,
-                            width: 45,
-                            child: AspectRatio(
-                              aspectRatio: 487 / 451,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    fit: BoxFit.fill,
-                                    alignment: FractionalOffset.topCenter,
-                                    image: MemoryImage(_file!),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const Divider(),
-                        ],
-                      )
-                    ],
-                  ),
+                        ),
+                      ),
+                    ),
+                    const Divider(),
+                  ],
+                )
+              ],
+            ),
           );
   }
 }
