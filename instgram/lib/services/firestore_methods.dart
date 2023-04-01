@@ -54,4 +54,66 @@ class FirestoreMethods {
       debugPrint("error on likePost ${error.toString()}");
     }
   }
+
+  Future<void> likeComment(
+      String commentId, String posttId, String uId, List likes) async {
+    try {
+      if (likes.contains(uId)) {
+        await _firestore
+            .collection("posts")
+            .doc(posttId)
+            .collection("comments")
+            .doc(commentId)
+            .update({
+          "likes": FieldValue.arrayRemove([uId])
+        });
+      } else {
+        await _firestore
+            .collection("posts")
+            .doc(posttId)
+            .collection("comments")
+            .doc(commentId)
+            .update({
+          "likes": FieldValue.arrayUnion([uId])
+        });
+      }
+    } catch (error) {
+      debugPrint("error on likePost ${error.toString()}");
+    }
+  }
+
+  Future<void> postComment(String postId, String text, String uId, String name,
+      String profilePic) async {
+    try {
+      if (text.isNotEmpty) {
+        String commentId = const Uuid().v1();
+        await _firestore
+            .collection("posts")
+            .doc(postId)
+            .collection("comments")
+            .doc(commentId)
+            .set({
+          "profilePic": profilePic,
+          "name": name,
+          "uid": uId,
+          "text": text,
+          "commentId": commentId,
+          "datePublished": DateTime.now(),
+          "likes": [],
+        });
+      } else {
+        debugPrint("Text is empty");
+      }
+    } catch (error) {
+      debugPrint(error.toString());
+    }
+  }
+
+  Future<void> deletePost(String postId) async {
+    try {
+      _firestore.collection("posts").doc(postId).delete();
+    } catch (error) {
+      debugPrint(error.toString());
+    }
+  }
 }

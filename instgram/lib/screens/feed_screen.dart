@@ -32,7 +32,10 @@ class FeedScreen extends StatelessWidget {
         ],
       ),
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection("posts").snapshots(),
+        stream: FirebaseFirestore.instance
+            .collection("posts")
+            .orderBy("datePublished", descending: true)
+            .snapshots(),
         builder: (context,
             AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -44,11 +47,13 @@ class FeedScreen extends StatelessWidget {
             return count == 0
                 ? const Center(
                     child: Text(
-                    "No posts currently!",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ))
+                      "No posts to show",
+                      style:
+                          TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                    ),
+                  )
                 : ListView.builder(
-                    itemCount: snapshot.data!.docs.length,
+                    itemCount: count,
                     itemBuilder: (context, index) => PostWidget(
                       snap: snapshot.data!.docs[index].data(),
                     ),

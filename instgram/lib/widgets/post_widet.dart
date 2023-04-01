@@ -2,14 +2,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:instgram/models/user_model.dart';
 import 'package:instgram/providers/user_provider.dart';
+import 'package:instgram/screens/comments_screen.dart';
 import 'package:instgram/services/firestore_methods.dart';
 import 'package:instgram/theme/colors.dart';
+
 import 'package:instgram/widgets/like_animation.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class PostWidget extends StatefulWidget {
-  final Map<String, dynamic> snap;
+  // ignore: prefer_typing_uninitialized_variables
+  final snap;
+
   const PostWidget({
     super.key,
     required this.snap,
@@ -21,10 +25,32 @@ class PostWidget extends StatefulWidget {
 
 class _PostWidgetState extends State<PostWidget> {
   bool isLikeAnimating = false;
+  int commentLength = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    getComments();
+  }
+
+  void getComments() async {
+    try {
+      QuerySnapshot snap = await FirebaseFirestore.instance
+          .collection("posts")
+          .doc(widget.snap["postId"])
+          .collection("comments")
+          .get();
+      commentLength = snap.docs.length;
+    } catch (error) {
+      debugPrint(error.toString());
+    }
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
     final UserModel user = Provider.of<UserProvider>(context).getUser;
+
     return Container(
       color: mobileBackgroundColor,
       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -72,7 +98,9 @@ class _PostWidgetState extends State<PostWidget> {
                               .map(
                                 (e) => InkWell(
                                   onTap: () {
-                                    debugPrint("Delete");
+                                    FirestoreMethods()
+                                        .deletePost(widget.snap["postId"]);
+                                    Navigator.pop(context);
                                   },
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(
@@ -155,9 +183,13 @@ class _PostWidgetState extends State<PostWidget> {
                 ),
               ),
               IconButton(
-                onPressed: () {
-                  debugPrint("comment");
-                },
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => CommentsScreen(
+                      snap: widget.snap,
+                    ),
+                  ),
+                ),
                 icon: const Icon(
                   Icons.comment_outlined,
                 ),
@@ -220,22 +252,55 @@ class _PostWidgetState extends State<PostWidget> {
                   ),
                 ),
                 InkWell(
-                  onTap: () {
-                    debugPrint("comments screen");
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: const Text(
-                      "View all 200 comments",
-                      style: TextStyle(fontSize: 16, color: secondaryColor),
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => CommentsScreen(
+                        snap: widget.snap,
+                      ),
                     ),
+                  ),
+                  child: Container(
+                    // snap.docs[0]["text"];
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: commentLength == 0
+                        ? const SizedBox()
+                        : commentLength == 1
+                            ? const Text(
+                                "view single comment",
+                                style: TextStyle(
+                                    fontSize: 16, color: secondaryColor),
+                              )
+                            : StreamBuilder(
+                                stream: FirebaseFirestore.instance
+                                    .collection("posts")
+                                    .doc(widget.snap["postId"])
+                                    .collection("comments")
+                                    .snapshots(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const SizedBox();
+                                  } else {
+                                    return Text(
+                                      "view all ${snapshot.data!.size} comments",
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        color: secondaryColor,
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
                   ),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: Text(
-                    DateFormat.yMMMd()
-                        .format(DateTime.parse(widget.snap["datePublished"])),
+                    DateFormat.yMMMd().format(
+                      DateTime.parse(
+                        widget.snap["datePublished"],
+                      ),
+                    ),
                     style: const TextStyle(fontSize: 16, color: secondaryColor),
                   ),
                 ),
