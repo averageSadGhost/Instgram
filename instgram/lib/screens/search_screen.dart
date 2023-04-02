@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:instgram/screens/profile_screen.dart';
 import 'package:instgram/theme/colors.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -44,7 +45,8 @@ class _SearchScreenState extends State<SearchScreen> {
                       isGreaterThanOrEqualTo: _searchController.text)
                   .get(),
               builder: (context, snapshot) {
-                if (!snapshot.hasData) {
+                if (!snapshot.hasData ||
+                    snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 }
                 return ListView.builder(
@@ -52,12 +54,19 @@ class _SearchScreenState extends State<SearchScreen> {
                   itemBuilder: (context, index) {
                     QueryDocumentSnapshot<Map<String, dynamic>> data =
                         snapshot.data!.docs[index];
-                    return ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: NetworkImage(data["profilePicUrl"]),
+                    return InkWell(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) =>
+                                ProfileScreen(uid: data["uid"])));
+                      },
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundImage: NetworkImage(data["profilePicUrl"]),
+                        ),
+                        title: Text(data["username"]),
+                        subtitle: Text(data["bio"]),
                       ),
-                      title: Text(data["username"]),
-                      subtitle: Text(data["bio"]),
                     );
                   },
                 );
