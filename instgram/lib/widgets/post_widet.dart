@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:instgram/global_variables.dart';
 import 'package:instgram/models/user_model.dart';
 import 'package:instgram/providers/user_provider.dart';
 import 'package:instgram/screens/comments_screen.dart';
@@ -50,9 +51,13 @@ class _PostWidgetState extends State<PostWidget> {
   @override
   Widget build(BuildContext context) {
     final UserModel user = Provider.of<UserProvider>(context).getUser;
+    final width = MediaQuery.of(context).size.width;
 
     return Container(
-      color: mobileBackgroundColor,
+      decoration: BoxDecoration(
+          border: Border.all(
+        color: width > webScreenSize ? secondaryColor : mobileBackgroundColor,
+      )),
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Column(
         children: [
@@ -264,33 +269,27 @@ class _PostWidgetState extends State<PostWidget> {
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     child: commentLength == 0
                         ? const SizedBox()
-                        : commentLength == 1
-                            ? const Text(
-                                "view single comment",
-                                style: TextStyle(
-                                    fontSize: 16, color: secondaryColor),
-                              )
-                            : StreamBuilder(
-                                stream: FirebaseFirestore.instance
-                                    .collection("posts")
-                                    .doc(widget.snap["postId"])
-                                    .collection("comments")
-                                    .snapshots(),
-                                builder: (context, snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.waiting) {
-                                    return const SizedBox();
-                                  } else {
-                                    return Text(
-                                      "view all ${snapshot.data!.size} comments",
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        color: secondaryColor,
-                                      ),
-                                    );
-                                  }
-                                },
-                              ),
+                        : StreamBuilder(
+                            stream: FirebaseFirestore.instance
+                                .collection("posts")
+                                .doc(widget.snap["postId"])
+                                .collection("comments")
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const SizedBox();
+                              } else {
+                                return Text(
+                                  "view ${snapshot.data!.size} comment",
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: secondaryColor,
+                                  ),
+                                );
+                              }
+                            },
+                          ),
                   ),
                 ),
                 Container(

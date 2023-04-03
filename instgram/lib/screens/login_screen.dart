@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:instgram/global_variables.dart';
 import 'package:instgram/screens/sign_up_screen.dart';
 import 'package:instgram/services/assets_manger.dart';
 import 'package:instgram/services/auth_methods.dart';
@@ -7,6 +8,9 @@ import 'package:instgram/theme/colors.dart';
 import 'package:instgram/widgets/custom_button.dart';
 import 'package:instgram/widgets/custom_text_field.dart';
 
+import '../responsive/mobile_screen_layout.dart';
+import '../responsive/responsive_layout_screen.dart';
+import '../responsive/web_screen_layout.dart';
 import '../services/show_snack_bar.dart';
 
 class LogInScreen extends StatefulWidget {
@@ -44,6 +48,17 @@ class _LogInScreenState extends State<LogInScreen> {
     } else {
       // ignore: use_build_context_synchronously
       showSnackBar("Logged in", context, false);
+
+      // ignore: use_build_context_synchronously
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const ResponsiveLayout(
+            webScreenLayout: WebScreenLayout(),
+            mobileScreenLayout: MobileScreenLayout(),
+          ),
+        ),
+      );
     }
   }
 
@@ -52,7 +67,10 @@ class _LogInScreenState extends State<LogInScreen> {
     return Scaffold(
       body: SafeArea(
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
+          padding: MediaQuery.of(context).size.width > webScreenSize
+              ? EdgeInsets.symmetric(
+                  horizontal: MediaQuery.of(context).size.width / 3)
+              : const EdgeInsets.symmetric(horizontal: 32),
           width: double.infinity,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,

@@ -3,16 +3,13 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:instgram/screens/login_screen.dart';
 import 'package:instgram/services/assets_manger.dart';
 import 'package:instgram/services/image_picker.dart';
 import 'package:instgram/services/show_snack_bar.dart';
 import 'package:instgram/theme/colors.dart';
 import 'package:instgram/widgets/custom_button.dart';
 import 'package:instgram/widgets/custom_text_field.dart';
-
-import '../responsive/mobile_screen_layout.dart';
-import '../responsive/responsive_layout_screen.dart';
-import '../responsive/web_screen_layout.dart';
 import '../services/auth_methods.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -70,16 +67,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
       // ignore: use_build_context_synchronously
       showSnackBar(
           "Account created successfully, please login", context, false);
+
       // ignore: use_build_context_synchronously
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => const ResponsiveLayout(
-            webScreenLayout: WebScreenLayout(),
-            mobileScreenLayout: MobileScreenLayout(),
-          ),
+          builder: (context) => const LogInScreen(),
         ),
       );
+      // ignore: use_build_context_synchronously
+      // Navigator.pushReplacement(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (context) => const ResponsiveLayout(
+      //       webScreenLayout: WebScreenLayout(),
+      //       mobileScreenLayout: MobileScreenLayout(),
+      //     ),
+      //   ),
+      // );
     }
   }
 
